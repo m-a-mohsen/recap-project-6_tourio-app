@@ -2,15 +2,24 @@ import clientPromise from "../../../../db/mongodb.ts";
 import { ObjectId } from "mongodb";
 
 export default async function handler(req, res) {
-
   const { id } = req.query;
-  if (!id) {
-    return;
+  // ---- check id ---------
+  /*
+  check if it is a valid ID
+  https://regex-generator.olafneumann.org/
+   */
+  function useRegex(input) {
+    let regex = /[A-Za-z0-9]+/i;
+    return regex.test(input);
   }
+  if (!useRegex(id)) {
+    return res.status(500).json({ error: "no ID" });;
+  }
+  // ----- GET Handle --------
   if (req.method === "GET") {
     try {
-      console.log(id)
-      console.log('id-object', new ObjectId(id))
+      // console.log(id)
+      // console.log('id-object', new ObjectId(id))
       const client = await clientPromise;
       const db = client.db("tourio-app");
       const placeCursorArr = await db.collection("places").aggregate([
@@ -28,25 +37,29 @@ export default async function handler(req, res) {
       const comments = placeCursorArr[0].comments;
       const place = placeCursorArr[0];
 
-      res.json({ place, comments });
+      return res.status(200).json({ place, comments });
     } catch (e) {
       console.error(e);
+      return res.status(500).json({ error: "didn't find anything" });
     }
   }
+  // ----- PATCH Handle --------
+
   if (req.method === "PATCH") {
     console.log(req.query)
     // console.log(id)
 
     try {
       console.log(req.body)
-      // const client = await clientPromise;
-      // const db = client.db("tourio-app");
-      // const results = await db
-      //   .collection("places").
+      const client = await clientPromise;
+      const db = client.db("tourio-app");
+      const results = await db
+        .collection("places").updateOne(
+          { _id: new ObjectId(id) },
+          { $set: req.body }
+        )
 
-
-
-      res.status(200).send({ ok: "lets go" });
+      return res.status(200).send(results);
     } catch (e) {
       console.error(e);
     }
