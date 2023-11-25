@@ -64,6 +64,24 @@ export default async function handler(req, res) {
       console.error(e);
     }
   }
+  // ----- Delete Handle --------
+
+  if (req.method === "DELETE") {
+    // console.log(req.query)
+    // console.log(id)
+
+    try {
+
+      const client = await clientPromise;
+      const db = client.db("tourio-app");
+      const results = await db
+        .collection("places").deleteOne({ _id: new ObjectId(id) })
+      console.log(results)
+      return res.status(200).send(results);
+    } catch (e) {
+      console.error(e);
+    }
+  }
 };
 
 // import { db_places } from "../../../../lib/db_places";

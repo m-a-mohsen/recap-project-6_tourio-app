@@ -40,9 +40,19 @@ export default function DetailsPage() {
   } = useSWR(`/api/places/${id}`);
 
   if (!isReady || isLoading || error) return <h2>Loading...</h2>;
+  // ------- frontEnd Delete
+  async function deletePlace() {
+    try {
+      const response = await fetch(`/api/places/${id}`, { method: "DELETE" });
 
-  function deletePlace() {
-    console.log("deleted?");
+      if (response.ok) {
+        router.push('/');
+        console.log("deleted");
+      }
+    } catch (error) {
+      console.log(error)
+    }
+
   }
 
   return (
