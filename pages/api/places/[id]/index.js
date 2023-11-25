@@ -2,13 +2,15 @@ import clientPromise from "../../../../db/mongodb.ts";
 import { ObjectId } from "mongodb";
 
 export default async function handler(req, res) {
-  
+
+  const { id } = req.query;
+  if (!id) {
+    return;
+  }
   if (req.method === "GET") {
-    const { id } = req.query;
-    if (!id) {
-      return;
-    }
     try {
+      console.log(id)
+      console.log('id-object', new ObjectId(id))
       const client = await clientPromise;
       const db = client.db("tourio-app");
       const placeCursorArr = await db.collection("places").aggregate([
@@ -25,7 +27,7 @@ export default async function handler(req, res) {
 
       const comments = placeCursorArr[0].comments;
       const place = placeCursorArr[0];
- 
+
       res.json({ place, comments });
     } catch (e) {
       console.error(e);
@@ -33,25 +35,22 @@ export default async function handler(req, res) {
   }
   if (req.method === "PATCH") {
     console.log(req.query)
-          const { id } = req.query;
-          // console.log(id)
-          if (!id) {
-            return;
-          }
-      try {
-        console.log(req.body)
-        // const client = await clientPromise;
-        // const db = client.db("tourio-app");
-        // const results = await db
-        //   .collection("places").
-          
+    // console.log(id)
+
+    try {
+      console.log(req.body)
+      // const client = await clientPromise;
+      // const db = client.db("tourio-app");
+      // const results = await db
+      //   .collection("places").
 
 
-        res.end();
-      } catch (e) {
-        console.error(e);
-      }
+
+      res.status(200).send({ ok: "lets go" });
+    } catch (e) {
+      console.error(e);
     }
+  }
 };
 
 // import { db_places } from "../../../../lib/db_places";
