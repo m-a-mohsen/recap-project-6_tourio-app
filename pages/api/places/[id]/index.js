@@ -34,14 +34,16 @@ export default async function handler(req, res) {
         },
       ]).toArray();
 
+
+
       const comments = placeCursorArr[0].comments;
       const place = placeCursorArr[0];
 
       return res.status(200).json({ place, comments });
     } catch (e) {
       console.error(e);
-      return res.status(500).json({ error: "didn't find anything" });
     }
+    return res.status(500).json({ error: "didn't find anything 2" });
   }
   // ----- PATCH Handle --------
 
@@ -63,6 +65,7 @@ export default async function handler(req, res) {
     } catch (e) {
       console.error(e);
     }
+    return res.status(500).send({ error: "server error" })
   }
   // ----- Delete Handle --------
 
@@ -82,6 +85,30 @@ export default async function handler(req, res) {
       console.error(e);
     }
   }
+
+
+  // ----- comment Post ------------------------
+  if (req.method === 'POST') {
+    try {
+      const client = await clientPromise;
+      const db = client.db("tourio-app");
+      console.log(req.body)
+      const commentResults = await db.collection("comments").insertOne(req.body)
+      const insertedId = await commentResults.insertedId
+
+      const updatePlace = await db.collection('places').updateOne(
+
+      )
+      console.log(commentResults)
+      console.log(commentResults.insertedId)
+      return res.status(200).json(commentResults);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+
+
 };
 
 // import { db_places } from "../../../../lib/db_places";

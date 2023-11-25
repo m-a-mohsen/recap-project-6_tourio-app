@@ -6,6 +6,7 @@ import { StyledLink } from "../../../components/StyledLink.js";
 import { StyledButton } from "../../../components/StyledButton.js";
 import { StyledImage } from "../../../components/StyledImage.js";
 import Comments from "../../../components/Comments.js";
+import { stringify } from "uuid";
 
 const ImageContainer = styled.div`
   position: relative;
@@ -40,7 +41,9 @@ export default function DetailsPage() {
   } = useSWR(`/api/places/${id}`);
 
   if (!isReady || isLoading || error) return <h2>Loading...</h2>;
-  // ------- frontEnd Delete
+
+
+  // ------- frontEnd Delete ---------
   async function deletePlace() {
     try {
       const response = await fetch(`/api/places/${id}`, { method: "DELETE" });
@@ -48,6 +51,27 @@ export default function DetailsPage() {
       if (response.ok) {
         router.push('/');
         console.log("deleted");
+      }
+    } catch (error) {
+      console.log(error)
+    }
+
+  }
+  // ------- frontEnd Comment submit ---------
+  async function onCommentSubmit(comment) {
+    try {
+      const response = await fetch(`/api/places/${id}`,
+        {
+          method: "POST",
+          body: JSON.stringify(comment),
+          headers: {
+            "Content-Type": "application/json",
+          }
+        });
+
+      if (response.ok) {
+        router.push(`/places/${id}`);
+        console.log("Comment Posted");
       }
     } catch (error) {
       console.log(error)
@@ -86,7 +110,7 @@ export default function DetailsPage() {
           Delete
         </StyledButton>
       </ButtonContainer>
-      <Comments locationName={place.name} comments={comments} />
+      <Comments locationName={place.name} comments={comments} onCommentSubmit={onCommentSubmit} />
     </>
   );
 }
