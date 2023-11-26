@@ -57,7 +57,7 @@ export default function DetailsPage() {
   if (error) {
     console.log(error);
     router.push("/404");
-    return <p>your are lost</p>;
+    // return <p>your are lost</p>;
   }
 
   // ------- frontEnd Delete ---------
