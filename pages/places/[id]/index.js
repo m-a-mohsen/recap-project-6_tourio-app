@@ -86,7 +86,7 @@ export default function DetailsPage() {
       </Link>
       <ImageContainer>
         <StyledImage
-          src={place.image}
+          src={place.image || 'https://images.unsplash.com/photo-1471623320832-752e8bbf8413?q=80&w=2859&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'}
           priority
           fill
           sizes="(max-width: 768px) 100vw,
