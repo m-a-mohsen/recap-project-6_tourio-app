@@ -38,14 +38,14 @@ export default function Comments({ locationName, comments, onCommentSubmit }) {
           <h1> {comments.length} fans commented on this place:</h1>
           {comments.map(({ name, comment }, idx) => {
             return (
-              <>
-                <p key={idx}>
+              <div key={idx}>
+                <p>
                   <small>
                     <strong>{name}</strong> commented on {locationName}
                   </small>
                 </p>
                 <span>{comment}</span>
-              </>
+              </div>
             );
           })}
         </>
