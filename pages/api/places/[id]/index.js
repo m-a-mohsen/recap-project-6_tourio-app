@@ -2,7 +2,7 @@ import clientPromise from "../../../../db/mongodb.ts";
 import { ObjectId } from "mongodb";
 
 export default async function handler(req, res) {
-  const { id } = req.query;
+  let { id } = req.query;
   // ---- check id ---------
   /*
   check if it is a valid ID
@@ -89,21 +89,42 @@ export default async function handler(req, res) {
 
   // ----- comment Post ------------------------
   if (req.method === 'POST') {
+    const client = await clientPromise;
+    const session = client.startSession()
+    const db = client.db("tourio-app");
+    console.log(req.body)
+    if (!useRegex(id)) {
+      return res.status(500).json({ error: "no ID" });;
+    }
     try {
-      const client = await clientPromise;
-      const db = client.db("tourio-app");
-      console.log(req.body)
-      const commentResults = await db.collection("comments").insertOne(req.body)
-      const insertedId = await commentResults.insertedId
+      const transactionResults = await session.withTransaction(async () => {
+        console.log("id", id)
+        if (!useRegex(id)) {
+          return res.status(500).json({ error: "no ID" });;
+        }
+        const commentResults = await db.collection("comments").insertOne(req.body, { session })
+        const insertedId = commentResults.insertedId
+        if (!insertedId) {
+          await session.abortTransaction()
+          return
+        }
+        const updatePlaceResults = await db.collection('places').updateOne(
+          { _id: new ObjectId(id) }, { $push: { comments: insertedId } }, { upsert: true, session }
+        )
+        console.log(commentResults)
+        console.log(updatePlaceResults)
+        return res.status(200).json(commentResults);
+      })
+      if (transactionResults) {
+        console.log("comments done");
+      } else {
+        console.log("didn't comment");
+      }
 
-      const updatePlace = await db.collection('places').updateOne(
-
-      )
-      console.log(commentResults)
-      console.log(commentResults.insertedId)
-      return res.status(200).json(commentResults);
     } catch (e) {
-      console.error(e);
+      console.log("no comments. The transaction was aborted due to an unexpected error: " + e);
+    } finally {
+      await session.endSession()
     }
   };
 
