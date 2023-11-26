@@ -6,7 +6,11 @@ import { StyledLink } from "../../../components/StyledLink.js";
 import { StyledButton } from "../../../components/StyledButton.js";
 import { StyledImage } from "../../../components/StyledImage.js";
 import Comments from "../../../components/Comments.js";
+import { fallBackObject } from "../../../lib/utils/fallBackObject";
+import Head from "next/head.js";
+import useRegex from "../../../lib/utils/regexCheck.ts";
 import { stringify } from "uuid";
+import { PageNotFoundError } from "next/dist/shared/lib/utils.js";
 
 const ImageContainer = styled.div`
   position: relative;
@@ -34,14 +38,27 @@ export default function DetailsPage() {
   const router = useRouter();
   const { isReady } = router;
   const { id } = router.query;
+  const idCheck = useRegex(id);
+  // if (!useRegex(id)) {
+  //   console.log("not a valid place");
+  //   // router.push("/");
+  //   return <p> your are lost </p>;
+  // }
   const {
     data: { place, comments } = {},
     isLoading,
     error,
   } = useSWR(`/api/places/${id}`);
 
-  if (!isReady || isLoading || error) return <h2>Loading...</h2>;
+  if (!isReady || isLoading) {
+    return <h2>Loading...</h2>;
+  }
 
+  if (error) {
+    console.log(error);
+    router.push("/404");
+    return <p>your are lost</p>;
+  }
 
   // ------- frontEnd Delete ---------
   async function deletePlace() {
@@ -49,44 +66,25 @@ export default function DetailsPage() {
       const response = await fetch(`/api/places/${id}`, { method: "DELETE" });
 
       if (response.ok) {
-        router.push('/');
+        router.push("/");
         console.log("deleted");
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-
-  }
-  // ------- frontEnd Comment submit ---------
-  async function onCommentSubmit(comment) {
-    try {
-      const response = await fetch(`/api/places/${id}`,
-        {
-          method: "POST",
-          body: JSON.stringify(comment),
-          headers: {
-            "Content-Type": "application/json",
-          }
-        });
-
-      if (response.ok) {
-        router.push(`/places/${id}`);
-        console.log("Comment Posted");
-      }
-    } catch (error) {
-      console.log(error)
-    }
-
   }
 
   return (
     <>
-      <Link href={'/'} passHref legacyBehavior>
+      <Head>
+        <title>{place?.name || "Tourio"}</title>
+      </Head>
+      <Link href={"/"} passHref legacyBehavior>
         <StyledLink justifySelf="start">back</StyledLink>
       </Link>
       <ImageContainer>
         <StyledImage
-          src={place.image || 'https://images.unsplash.com/photo-1471623320832-752e8bbf8413?q=80&w=2859&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'}
+          src={place?.image || fallBackObject.image}
           priority
           fill
           sizes="(max-width: 768px) 100vw,
@@ -96,12 +94,17 @@ export default function DetailsPage() {
         />
       </ImageContainer>
       <h2>
-        {place.name}, {place.location}
+        {place?.name || fallBackObject.name},{" "}
+        {place?.location || fallBackObject.location}
       </h2>
-      <Link href={place.mapURL} passHref legacyBehavior>
+      <Link
+        href={place?.mapURL || fallBackObject.mapURL}
+        passHref
+        legacyBehavior
+      >
         <StyledLocationLink>Location on Google Maps</StyledLocationLink>
       </Link>
-      <p>{place.description}</p>
+      <p>{place?.description}</p>
       <ButtonContainer>
         <Link href={`/places/${id}/edit`} passHref legacyBehavior>
           <StyledLink>Edit</StyledLink>
@@ -110,7 +113,7 @@ export default function DetailsPage() {
           Delete
         </StyledButton>
       </ButtonContainer>
-      <Comments locationName={place.name} comments={comments} onCommentSubmit={onCommentSubmit} />
+      <Comments locationName={place?.name} comments={comments} />
     </>
   );
 }

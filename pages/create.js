@@ -12,22 +12,19 @@ export default function CreatePlacePage() {
   const router = useRouter();
 
   async function addPlace(place) {
-      const response = await fetch("/api/places", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(place),
-  });
-  if (response.ok) {
-    router.push("/");
+    const response = await fetch("/api/places", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(place),
+    });
+    if (response.ok) {
+      router.push("/");
+    }
+
+    console.log("Place added ", place);
   }
-
-    console.log("Place added (but not really...)",place);
-  }
-
-
-
 
   return (
     <>
@@ -35,7 +32,7 @@ export default function CreatePlacePage() {
       <Link href="/" passHref legacyBehavior>
         <StyledBackLink>back</StyledBackLink>
       </Link>
-      <Form onSubmit={addPlace} formName={'add-place'} />
+      <Form onSubmit={addPlace} formName={"add-place"} />
     </>
   );
 }

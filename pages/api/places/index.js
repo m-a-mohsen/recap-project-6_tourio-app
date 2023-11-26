@@ -5,36 +5,34 @@
 import clientPromise from "../../../db/mongodb";
 
 export default async (req, res) => {
-
   // ----- GET ------------------------
-  if (req.method === 'GET') {
+  if (req.method === "GET") {
     try {
       const client = await clientPromise;
       const db = client.db("tourio-app");
 
       const places = await db.collection("places").find({}).toArray();
-
-      res.status(200).json(places);
+      return res.status(200).json(places);
     } catch (e) {
       console.error(e);
     }
-  };
+    return res.status(404);
+  }
 
   // ----- Post ------------------------
-  if (req.method === 'POST') {
+  if (req.method === "POST") {
     try {
       const client = await clientPromise;
       const db = client.db("tourio-app");
-      console.log(req.body)
-      const results = await db.collection("places").insertOne(req.body)
-      console.log(results)
-      res.status(200).json(results);
+      console.log(req.body);
+      const results = await db.collection("places").insertOne(req.body);
+      console.log(results);
+      return res.status(200).json(results);
     } catch (e) {
       console.error(e);
     }
-  };
-
-}
+  }
+};
 
 // export default async function handler(request, response) {
 //   await dbConnect();

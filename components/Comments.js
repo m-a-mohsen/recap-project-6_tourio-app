@@ -1,8 +1,9 @@
 import styled from "styled-components";
 import { FormContainer, Input, Label } from "./Form";
 import { StyledButton } from "./StyledButton.js";
+import { useRouter } from "next/router.js";
 
-export default function Comments({ locationName, comments, onCommentSubmit }) {
+export default function Comments({ locationName, comments }) {
   const Article = styled.article`
     display: flex;
     flex-direction: column;
@@ -16,14 +17,34 @@ export default function Comments({ locationName, comments, onCommentSubmit }) {
       padding: 20px;
     }
   `;
+  const router = useRouter();
+  const { id } = router.query;
 
-  function handleSubmitComment(e) {
+  async function handleSubmitComment(e) {
     e.preventDefault();
     const formData = new FormData(e.target);
-    const data = Object.fromEntries(formData);
-    onCommentSubmit(data);
+    const comment = Object.fromEntries(formData);
+    try {
+      const response = await fetch(`/api/places/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(comment),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        // router.push(`/places/${id}`);
+        router.reload();
+        console.log("Comment Posted");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
+  // ------- frontEnd Comment submit ---------
+  async function onCommentSubmit(comment) {}
   return (
     <Article>
       <FormContainer onSubmit={handleSubmitComment}>
