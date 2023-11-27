@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useRouter } from "next/router";
 import Form from "../components/Form.js";
 import { StyledLink } from "../components/StyledLink.js";
+import { toast } from "sonner";
 
 const StyledBackLink = styled(StyledLink)`
   justify-self: flex-start;
@@ -21,6 +22,7 @@ export default function CreatePlacePage() {
     });
     if (response.ok) {
       router.push("/");
+      toast.success(`"${place.name || "place"}" was added successfully `);
     }
 
     console.log("Place added ", place);

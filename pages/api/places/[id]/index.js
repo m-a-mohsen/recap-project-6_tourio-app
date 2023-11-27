@@ -68,8 +68,8 @@ export default async function handler(req, res) {
       return res.status(200).send(results);
     } catch (e) {
       console.error(e);
+      return res.status(500).send({ error: "server error" });
     }
-    return res.status(500).send({ error: "server error" });
   }
   // ----- Delete Handle --------
 

@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { FormContainer, Input, Label } from "./Form";
 import { StyledButton } from "./StyledButton.js";
 import { useRouter } from "next/router.js";
+import { toast } from "sonner";
 
 export default function Comments({ locationName, comments }) {
   const Article = styled.article`
@@ -35,7 +36,9 @@ export default function Comments({ locationName, comments }) {
 
       if (response.ok) {
         // router.push(`/places/${id}`);
+        toast.success(`${comment.name || "user"}'s comment was posted`);
         router.reload();
+
         console.log("Comment Posted");
       }
     } catch (error) {

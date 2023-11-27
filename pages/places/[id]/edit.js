@@ -4,6 +4,7 @@ import useSWR from "swr";
 import Form from "../../../components/Form.js";
 import { StyledLink } from "../../../components/StyledLink.js";
 import useSWRMutation from "swr/mutation";
+import { toast } from "sonner";
 
 export default function EditPage() {
   const router = useRouter();
@@ -12,8 +13,9 @@ export default function EditPage() {
   const { data: place, isLoading, error } = useSWR(`/api/places/${id}`);
   const { trigger, isMutating } = useSWRMutation(
     `/api/places/${id}`,
-    editPlace,
+    editPlace
   );
+  //----- frontEnd Edit -------------
   async function editPlace(place) {
     const response = await fetch(`/api/places/${id}`, {
       method: "PATCH",
@@ -26,6 +28,7 @@ export default function EditPage() {
     if (response.ok) {
       // await trigger(place)
       router.push(`/places/${id}`);
+      toast.success(`"${place.name || "place"}" was updated`);
       console.log("Place edited ");
     }
   }

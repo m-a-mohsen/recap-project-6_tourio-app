@@ -10,7 +10,7 @@ import { fallBackObject } from "../../../lib/utils/fallBackObject";
 import Head from "next/head.js";
 import useRegex from "../../../lib/utils/regexCheck.ts";
 import { stringify } from "uuid";
-import { PageNotFoundError } from "next/dist/shared/lib/utils.js";
+import { toast } from "sonner";
 
 const ImageContainer = styled.div`
   position: relative;
@@ -38,7 +38,7 @@ export default function DetailsPage() {
   const router = useRouter();
   const { isReady } = router;
   const { id } = router.query;
-  const idCheck = useRegex(id);
+  // const idCheck = useRegex(id);
   // if (!useRegex(id)) {
   //   console.log("not a valid place");
   //   // router.push("/");
@@ -62,16 +62,27 @@ export default function DetailsPage() {
 
   // ------- frontEnd Delete ---------
   async function deletePlace() {
-    try {
-      const response = await fetch(`/api/places/${id}`, { method: "DELETE" });
+    toast.error(`Do you really want to delete "${place.name || "place"}"?`, {
+      action: {
+        label: "delete",
+        onClick: async () => {
+          try {
+            const response = await fetch(`/api/places/${id}`, {
+              method: "DELETE",
+            });
 
-      if (response.ok) {
-        router.push("/");
-        console.log("deleted");
-      }
-    } catch (error) {
-      console.log(error);
-    }
+            if (response.ok) {
+              toast.warning(`"${place.name || "place"}" was deleted`);
+              router.push("/");
+            }
+          } catch (error) {
+            console.log(error);
+            toast.warning(`"${place.name}" was NOT deleted`);
+          }
+          // toast.info(`"${place.name}" was deleted`);
+        },
+      },
+    });
   }
 
   return (
