@@ -1,6 +1,7 @@
 import TitleBar from "./TitleBar.js";
 import styled from "styled-components";
 import Head from "next/head.js";
+import { Toaster } from "sonner";
 
 const Main = styled.main`
   display: grid;
@@ -19,6 +20,7 @@ export default function Layout({ children }) {
       </Head>
       <TitleBar />
       <Main>{children}</Main>
+      <Toaster richColors position="bottom-left" />
     </>
   );
 }

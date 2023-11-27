@@ -1,7 +1,7 @@
 import Link from "next/link.js";
 import styled from "styled-components";
 import { StyledImage } from "./StyledImage.js";
-
+import { fallBackObject } from "../lib/utils/fallBackObject.ts";
 const Article = styled.article`
   border: 5px solid black;
   border-radius: 0.8rem;
@@ -48,7 +48,7 @@ export default function Card({ name, image, location, id }) {
       <Figure>
         <ImageContainer>
           <StyledImage
-            src={image}
+            src={image || fallBackObject.image}
             fill
             sizes="(max-width: 768px) 100vw,
               (max-width: 1200px) 50vw,
@@ -56,9 +56,9 @@ export default function Card({ name, image, location, id }) {
             alt=""
           />
         </ImageContainer>
-        <figcaption>{name}</figcaption>
+        <figcaption>{name || fallBackObject.name}</figcaption>
       </Figure>
-      <p>Location: {location}</p>
+      <p>Location: {location || fallBackObject.location}</p>
       <Link href={`places/${id}`} passHref legacyBehavior>
         <Anchor>
           <ScreenReaderOnly>More Info</ScreenReaderOnly>

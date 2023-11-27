@@ -1,6 +1,8 @@
 import styled from "styled-components";
 import { FormContainer, Input, Label } from "./Form";
 import { StyledButton } from "./StyledButton.js";
+import { useRouter } from "next/router.js";
+import { toast } from "sonner";
 
 export default function Comments({ locationName, comments }) {
   const Article = styled.article`
@@ -16,11 +18,36 @@ export default function Comments({ locationName, comments }) {
       padding: 20px;
     }
   `;
+  const router = useRouter();
+  const { id } = router.query;
 
-  function handleSubmitComment(e) {
+  async function handleSubmitComment(e) {
     e.preventDefault();
+    const formData = new FormData(e.target);
+    const comment = Object.fromEntries(formData);
+    try {
+      const response = await fetch(`/api/places/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(comment),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        // router.push(`/places/${id}`);
+        toast.success(`${comment.name || "user"}'s comment was posted`);
+        router.reload();
+
+        console.log("Comment Posted");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
+  // ------- frontEnd Comment submit ---------
+  async function onCommentSubmit(comment) {}
   return (
     <Article>
       <FormContainer onSubmit={handleSubmitComment}>
@@ -35,14 +62,14 @@ export default function Comments({ locationName, comments }) {
           <h1> {comments.length} fans commented on this place:</h1>
           {comments.map(({ name, comment }, idx) => {
             return (
-              <>
-                <p key={idx}>
+              <div key={idx}>
+                <p>
                   <small>
                     <strong>{name}</strong> commented on {locationName}
                   </small>
                 </p>
                 <span>{comment}</span>
-              </>
+              </div>
             );
           })}
         </>

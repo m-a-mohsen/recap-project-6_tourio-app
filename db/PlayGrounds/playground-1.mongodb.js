@@ -11,14 +11,41 @@
 
 // import { ObjectId } from "mongodb";
 // const ObjectId = require("mongodb")
-var ObjectId = require("mongodb").ObjectId;
+// var ObjectId = require("mongodb").ObjectId;
 
 // Select the database to use.
 use("tourio-app");
 
 // Insert a few documents into the sales collection.
 // db.getCollection("places").findOne({ _id: "64e7739ea38da8d43bdcfb8b" });
-db.getCollection("places").findOne({"_id": new ObjectId("64e7739ea38da8d43bdcfb8b")});
+// db.getCollection("places").find({"_id": new ObjectId("64e7739ea38da8d43bdcfb8b")});
+
+//-----GET one with comments -----
+db.getCollection("places").aggregate([
+  { $match: { _id: new ObjectId("64e7739ea38da8d43bdcfb83") } },
+  {
+    $lookup: {
+      from: "comments",
+      localField: "comments",
+      foreignField: "_id",
+      as: "comments",
+    },
+  },
+]);
+
+//-----update one place -----
+// db.getCollection("places").updateOne(
+//   { _id: new ObjectId("65610cb8f2fcc18d1e0417fc") },
+//   {
+//     $set: {
+//       name: "hi",
+//       image: "",
+//       location: "low",
+//       mapURL: "go",
+//       description: "fooooo",
+//     },
+//   },
+// );
 
 // // Run a find command to view items sold on April 4th, 2014.
 // const salesOnApril4th = db.getCollection('sales').find({
